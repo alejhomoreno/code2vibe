@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code2Vibe</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <main class="container">
+        <header class="header">
+            <h1>Code2Vibe</h1>
+            <p class="subtitle">Translate your code into emotions and music 🎶</p>
+        </header>
+
+        <section class="input-section">
+            <textarea id="codeInput" placeholder="Paste your code here..."></textarea>
+            <button id="analyzeBtn">Analyze Vibe</button>
+        </section>
+
+        <section class="result-section">
+            <div id="vibeResult" class="vibe-card"></div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('analyzeBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('analyzeBtn');
+            const textarea = document.getElementById('codeInput');
+            const resultDiv = document.getElementById('vibeResult');
+            const code = textarea.value;
+            
+            if (!code.trim()) return; // do nothing if empty
+
+            btn.textContent = 'Analyzing...';
+            resultDiv.innerHTML = ''; // clear previous result
+
+            try {
+                const res = await fetch('http://localhost:3000/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const data = await res.json();
+                const { emotion, song_title, artist, story, playlist_url } = data;
+                
+                resultDiv.innerHTML = `
+                    <h3>Emotion: ${emotion}</h3>
+                    <p>🎧 Vibe Track: <strong>"${song_title}"</strong> by <strong>${artist}</strong></p>
+                    <p><strong>Story:</strong> ${story}</p>
+                    <a href="${playlist_url}" target="_blank" class="playlist-link">🎧 Listen to the Vibe on YouTube</a>
+                `;
+            } catch (err) {
+                resultDiv.textContent = 'Error analyzing vibe.';
+                console.error(err);
+            } finally {
+                btn.textContent = 'Analyze Vibe';
+            }
+        });
+    </script>
+    
+</body>
+
+</html>
